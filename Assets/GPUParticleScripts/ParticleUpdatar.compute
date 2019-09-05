@@ -1,0 +1,20 @@
+﻿#pragma kernel CSMain
+
+struct Particle {
+	float3 pos;
+	float3 vec;
+};
+ 
+float DeltaTime;
+float3 targetPos;
+float maxSpeed;
+float attractor;
+ 
+RWStructuredBuffer<Particle> Particles;
+ 
+[numthreads(8,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID){
+    Particles[id.x].vec = Particles[id.x].vec + (targetPos-Particles[id.x].pos) * attractor;
+    Particles[id.x].vec = clamp(length(Particles[id.x].vec),0.0f,maxSpeed) * normalize(Particles[id.x].vec);
+    Particles[id.x].pos += Particles[id.x].vec * DeltaTime;
+}
